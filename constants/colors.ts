@@ -1,34 +1,39 @@
 /**
- * Refsurface — dark-first warm color palette
+ * Resurface — warm dark colour palette
  *
- * Near-black backgrounds, warm off-white text, amber accent.
+ * Near-black amber-tinted backgrounds, cream text, amber accent.
+ * Update tailwind.config.js alongside this file — they share the same tokens.
  */
 export const Colors = {
-  // Backgrounds
-  background: '#121210',       // near-black with faint warm tint
-  surface: '#1E1C1A',          // card / sheet surface
-  surfaceRaised: '#28251F',    // elevated surface (modals, popovers)
+  // ── Backgrounds ────────────────────────────────────────────────────────────
+  background:     '#1A1108',   // deep warm near-black
+  surface:        '#251A0E',   // card / sheet surface
+  surfaceRaised:  '#2A2015',   // elevated surface / map placeholder
 
-  // Text
-  textPrimary: '#F5F0E8',      // warm white — primary readable text
-  textSecondary: '#A89F8C',    // warm mid-gray — labels, captions
-  textDisabled: '#5C5650',     // muted — placeholder / disabled state
+  // ── Amber accent ───────────────────────────────────────────────────────────
+  amber:          '#E8A830',   // primary accent — CTAs, active states, pins
+  amberLight:     '#F5C454',   // lighter amber — hover / highlights
+  accentMuted:    '#8C5F14',   // dim amber — pressed backgrounds
+  accentSubtle:   '#2B1E0A',   // very dim amber — tinted backgrounds
 
-  // Accent
-  accent: '#F5A623',           // amber — CTAs, highlights, active tabs
-  accentMuted: '#8C5F14',      // dim amber — pressed states, backgrounds
-  accentSubtle: '#2B1E0A',     // very dim amber — tinted backgrounds
+  // ── Cream text ─────────────────────────────────────────────────────────────
+  cream:          '#F0E6D0',   // primary text (warm white)
+  creamMuted:     '#9C8E7A',   // secondary / muted text
+  textDisabled:   '#5C5650',   // placeholder / disabled
 
-  // Semantic
-  success: '#6FCF97',
-  warning: '#F5A623',          // shares amber accent
-  error: '#EB5757',
+  // ── Polaroid card ──────────────────────────────────────────────────────────
+  polaroid:       '#F5F0E8',   // card body (classic film border)
+  polaroidCaption:'#8A7D6E',   // italic caption inside card
 
-  // Borders & dividers
-  border: '#2E2A25',
-  divider: '#1E1C1A',
+  // ── Semantic ───────────────────────────────────────────────────────────────
+  success:        '#6FCF97',
+  error:          '#EB5757',
 
-  // Overlays
+  // ── Borders & dividers ─────────────────────────────────────────────────────
+  border:         '#3D2E1A',
+  divider:        '#251A0E',
+
+  // ── Overlays ───────────────────────────────────────────────────────────────
   overlay: 'rgba(0, 0, 0, 0.6)',
 } as const;
 

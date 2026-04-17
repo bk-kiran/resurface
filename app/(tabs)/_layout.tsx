@@ -1,6 +1,5 @@
 import { Tabs } from 'expo-router';
 import { Colors } from '../../constants/colors';
-import { FontSize } from '../../constants/typography';
 
 export default function TabLayout() {
   return (
@@ -12,10 +11,10 @@ export default function TabLayout() {
           borderTopColor: Colors.border,
           borderTopWidth: 1,
         },
-        tabBarActiveTintColor: Colors.accent,
-        tabBarInactiveTintColor: Colors.textSecondary,
+        tabBarActiveTintColor: Colors.amber,
+        tabBarInactiveTintColor: Colors.creamMuted,
         tabBarLabelStyle: {
-          fontSize: FontSize.xs,
+          fontSize: 11,
           fontWeight: '500',
           letterSpacing: 0.5,
         },
@@ -23,7 +22,10 @@ export default function TabLayout() {
     >
       <Tabs.Screen
         name="index"
-        options={{ title: 'Play' }}
+        options={{
+          title: 'Play',
+          tabBarStyle: { display: 'none' },
+        }}
       />
       <Tabs.Screen
         name="map"

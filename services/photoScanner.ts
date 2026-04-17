@@ -17,6 +17,9 @@ export type ScanError = ScanResult & { error: 'PERMISSIONS_DENIED' };
 
 const PAGE_SIZE = 100;
 const SCORE_THRESHOLD = 0.5;
+// expo-face-detector is unavailable in SDK 54 managed workflow;
+// all photos that pass location + screenshot filters get a fixed score.
+const DEFAULT_MEMORY_SCORE = 0.7;
 
 // Common screenshot aspect ratios (width:height expressed as w/h)
 // 9:19.5 ≈ 0.4615, 9:20 = 0.45
@@ -25,41 +28,6 @@ const SCREENSHOT_RATIOS: Array<[number, number]> = [
   [9, 20],
 ];
 const RATIO_EPSILON = 0.01;
-
-// ─── Face detection (optional) ───────────────────────────────────────────────
-
-type FaceDetector = {
-  detectFacesAsync: (
-    uri: string,
-    options?: { mode?: number; detectLandmarks?: number; runClassifications?: number },
-  ) => Promise<{ faces: unknown[] }>;
-};
-
-let _faceDetector: FaceDetector | null | undefined = undefined; // undefined = not yet tried
-
-async function tryDetectFaces(uri: string): Promise<number | null> {
-  if (_faceDetector === null) return null; // known unavailable
-
-  try {
-    if (_faceDetector === undefined) {
-      // First call — attempt to load the module
-      // eslint-disable-next-line @typescript-eslint/no-require-imports
-      _faceDetector = require('expo-face-detector') as FaceDetector;
-    }
-    const result = await _faceDetector.detectFacesAsync(uri, { mode: 1 });
-    return result.faces.length;
-  } catch {
-    _faceDetector = null; // mark as unavailable for remaining photos
-    return null;
-  }
-}
-
-function scoreFromFaceCount(faceCount: number | null): number {
-  if (faceCount === null) return 0.7; // face detector unavailable
-  if (faceCount === 0) return 0.1;
-  if (faceCount === 1) return 0.6;
-  return 1.0; // 2+
-}
 
 // ─── Filters ─────────────────────────────────────────────────────────────────
 
@@ -145,9 +113,8 @@ export async function runScan(
         continue;
       }
 
-      // ── Face detection & scoring ──────────────────────────────────────────
-      const faceCount = await tryDetectFaces(info.localUri ?? asset.uri);
-      const memory_score = scoreFromFaceCount(faceCount);
+      // ── Scoring ───────────────────────────────────────────────────────────
+      const memory_score = DEFAULT_MEMORY_SCORE;
       const isEligible = memory_score >= SCORE_THRESHOLD;
 
       // ── Upsert into DB ────────────────────────────────────────────────────
@@ -158,7 +125,7 @@ export async function runScan(
         longitude: info.location.longitude,
         taken_at: Math.floor(asset.creationTime / 1000),
         memory_score,
-        face_count: faceCount,
+        face_count: null,
         eligible: isEligible ? 1 : 0,
       };
 

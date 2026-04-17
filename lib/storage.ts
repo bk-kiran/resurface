@@ -1,8 +1,8 @@
-import { createMMKV } from 'react-native-mmkv';
+import { MMKV } from 'react-native-mmkv';
 
 // ─── Singleton ───────────────────────────────────────────────────────────────
 
-const storage = createMMKV({ id: 'resurface' });
+const storage = new MMKV({ id: 'resurface' });
 
 // ─── Keys ────────────────────────────────────────────────────────────────────
 
@@ -31,7 +31,7 @@ export function getTodayPhotoId(): string | null {
 
 export function setTodayPhotoId(value: string | null): void {
   if (value === null) {
-    storage.remove(KEYS.todayPhotoId);
+    storage.delete(KEYS.todayPhotoId);
   } else {
     storage.set(KEYS.todayPhotoId, value);
   }
@@ -45,7 +45,7 @@ export function getTodayPhotoDate(): string | null {
 
 export function setTodayPhotoDate(value: string | null): void {
   if (value === null) {
-    storage.remove(KEYS.todayPhotoDate);
+    storage.delete(KEYS.todayPhotoDate);
   } else {
     storage.set(KEYS.todayPhotoDate, value);
   }
@@ -59,7 +59,7 @@ export function getLastScanDate(): string | null {
 
 export function setLastScanDate(value: string | null): void {
   if (value === null) {
-    storage.remove(KEYS.lastScanDate);
+    storage.delete(KEYS.lastScanDate);
   } else {
     storage.set(KEYS.lastScanDate, value);
   }
