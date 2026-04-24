@@ -1,8 +1,9 @@
-import { View, Text, FlatList, TouchableOpacity, Dimensions, StatusBar } from 'react-native'
+import { View, Text, FlatList, TouchableOpacity, Dimensions, StatusBar, Image } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { router } from 'expo-router'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useFonts, PlayfairDisplay_700Bold, PlayfairDisplay_400Regular_Italic } from '@expo-google-fonts/playfair-display'
+import * as MediaLibrary from 'expo-media-library'
 
 const { width: SW, height: SH } = Dimensions.get('window')
 
@@ -14,6 +15,30 @@ export default function PlayScreen() {
   const insets = useSafeAreaInsets()
   const [selectedYear, setSelectedYear] = useState('2023')
   const [selectedMonth, setSelectedMonth] = useState('JAN')
+  const [photo, setPhoto] = useState<MediaLibrary.Asset | null>(null)
+  const [photoLocation, setPhotoLocation] = useState<{ latitude: number; longitude: number } | null>(null)
+  const [photoDate, setPhotoDate] = useState<number | null>(null)
+
+  useEffect(() => {
+    ;(async () => {
+      const { granted } = await MediaLibrary.requestPermissionsAsync()
+      if (!granted) return
+      const { assets } = await MediaLibrary.getAssetsAsync({
+        mediaType: 'photo',
+        first: 100,
+        sortBy: 'creationTime',
+      })
+      const withLocation = assets.filter((a) => (a as any).location != null)
+      const pool = withLocation.length > 0 ? withLocation : assets
+      if (pool.length === 0) return
+      const asset = pool[Math.floor(Math.random() * pool.length)]
+      const assetInfo = await MediaLibrary.getAssetInfoAsync(asset.id)
+      setPhoto({ ...asset, uri: assetInfo.localUri ?? assetInfo.uri })
+      const loc = (asset as any).location ?? assetInfo.location
+      if (loc) setPhotoLocation(loc)
+      setPhotoDate(asset.creationTime)
+    })()
+  }, [])
 
   const [fontsLoaded] = useFonts({ PlayfairDisplay_700Bold, PlayfairDisplay_400Regular_Italic })
   if (!fontsLoaded) return null
@@ -84,7 +109,11 @@ export default function PlayScreen() {
           padding: 8,
           paddingBottom: 28,
         }}>
-          <View style={{ flex: 1, backgroundColor: '#2A3A4A', borderRadius: 2 }} />
+          {photo ? (
+            <Image source={{ uri: photo.uri }} style={{ flex: 1, borderRadius: 2 }} resizeMode="cover" />
+          ) : (
+            <View style={{ flex: 1, backgroundColor: '#2A3A4A', borderRadius: 2 }} />
+          )}
           <Text style={{
             position: 'absolute',
             bottom: 8,
@@ -92,7 +121,7 @@ export default function PlayScreen() {
             color: '#9C8E7A',
             fontSize: 11,
             fontFamily: 'PlayfairDisplay_400Regular_Italic'
-          }}>Untitled Memory</Text>
+          }}>{photoDate ? new Date(photoDate).getFullYear().toString() : 'Untitled Memory'}</Text>
         </View>
       </View>
 
@@ -209,7 +238,13 @@ export default function PlayScreen() {
           }}
           onPress={() => router.push({
             pathname: '/reveal',
-            params: { guessMonth: selectedMonth, guessYear: selectedYear }
+            params: {
+              guessMonth: selectedMonth,
+              guessYear: selectedYear,
+              actualLat: photoLocation?.latitude ?? 42.3601,
+              actualLng: photoLocation?.longitude ?? -71.0589,
+              actualDate: photoDate ?? Date.now(),
+            },
           })}
         >
           <Text style={{
