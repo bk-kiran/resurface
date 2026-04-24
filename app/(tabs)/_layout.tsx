@@ -24,17 +24,13 @@ export default function TabLayout() {
         name="index"
         options={{
           title: 'Play',
-          tabBarStyle: { display: 'none' },
+          // position:absolute removes the tab bar from layout flow so
+          // it adds zero bottom padding to the play screen content
+          tabBarStyle: { position: 'absolute', height: 0, overflow: 'hidden' },
         }}
       />
-      <Tabs.Screen
-        name="map"
-        options={{ title: 'Map' }}
-      />
-      <Tabs.Screen
-        name="history"
-        options={{ title: 'History' }}
-      />
+      <Tabs.Screen name="map" options={{ title: 'Map' }} />
+      <Tabs.Screen name="history" options={{ title: 'History' }} />
     </Tabs>
   );
 }

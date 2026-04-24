@@ -1,66 +1,32 @@
-import { MMKV } from 'react-native-mmkv';
-
-// ─── Singleton ───────────────────────────────────────────────────────────────
-
-const storage = new MMKV({ id: 'resurface' });
-
-// ─── Keys ────────────────────────────────────────────────────────────────────
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const KEYS = {
-  hasCompletedOnboarding: 'hasCompletedOnboarding',
-  todayPhotoId: 'todayPhotoId',
-  todayPhotoDate: 'todayPhotoDate',
-  lastScanDate: 'lastScanDate',
-} as const;
+  onboarding: 'has_completed_onboarding',
+  todayPhoto: 'today_photo_id',
+  lastScan: 'last_scan_date',
+};
 
-// ─── hasCompletedOnboarding ──────────────────────────────────────────────────
+export const getHasCompletedOnboarding = async (): Promise<boolean> => {
+  const val = await AsyncStorage.getItem(KEYS.onboarding);
+  return val === 'true';
+};
 
-export function getHasCompletedOnboarding(): boolean {
-  return storage.getBoolean(KEYS.hasCompletedOnboarding) ?? false;
-}
+export const setHasCompletedOnboarding = async (v: boolean) => {
+  await AsyncStorage.setItem(KEYS.onboarding, String(v));
+};
 
-export function setHasCompletedOnboarding(value: boolean): void {
-  storage.set(KEYS.hasCompletedOnboarding, value);
-}
+export const getTodayPhotoId = async (): Promise<string | null> => {
+  return AsyncStorage.getItem(KEYS.todayPhoto);
+};
 
-// ─── todayPhotoId ────────────────────────────────────────────────────────────
+export const setTodayPhotoId = async (v: string) => {
+  await AsyncStorage.setItem(KEYS.todayPhoto, v);
+};
 
-export function getTodayPhotoId(): string | null {
-  return storage.getString(KEYS.todayPhotoId) ?? null;
-}
+export const getLastScanDate = async (): Promise<string | null> => {
+  return AsyncStorage.getItem(KEYS.lastScan);
+};
 
-export function setTodayPhotoId(value: string | null): void {
-  if (value === null) {
-    storage.delete(KEYS.todayPhotoId);
-  } else {
-    storage.set(KEYS.todayPhotoId, value);
-  }
-}
-
-// ─── todayPhotoDate ──────────────────────────────────────────────────────────
-
-export function getTodayPhotoDate(): string | null {
-  return storage.getString(KEYS.todayPhotoDate) ?? null;
-}
-
-export function setTodayPhotoDate(value: string | null): void {
-  if (value === null) {
-    storage.delete(KEYS.todayPhotoDate);
-  } else {
-    storage.set(KEYS.todayPhotoDate, value);
-  }
-}
-
-// ─── lastScanDate ────────────────────────────────────────────────────────────
-
-export function getLastScanDate(): string | null {
-  return storage.getString(KEYS.lastScanDate) ?? null;
-}
-
-export function setLastScanDate(value: string | null): void {
-  if (value === null) {
-    storage.delete(KEYS.lastScanDate);
-  } else {
-    storage.set(KEYS.lastScanDate, value);
-  }
-}
+export const setLastScanDate = async (v: string) => {
+  await AsyncStorage.setItem(KEYS.lastScan, v);
+};
